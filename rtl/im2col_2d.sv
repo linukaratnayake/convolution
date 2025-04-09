@@ -18,24 +18,20 @@ module im2col_2d
 );
 
     always_comb begin
-        // Declare variables outside the loops
         int offset_x;
         int offset_y;
         int image_y;
         int image_x;
         
         for (int i = 0; i < OUTPUT_HEIGTH; i++) begin
-            // Calculate the offsets
             offset_x = i % KERNEL_SIZE;
-            offset_y = i / KERNEL_SIZE;
+            offset_y = (i / KERNEL_SIZE) % KERNEL_SIZE;
             
             for (int j = 0; j < VERTICAL_POSITIONS; j++) begin
                 for (int k = 0; k < HORIZONTAL_POSITIONS; k++) begin
-                    // Calculate actual image positions
                     image_y = j + offset_y;
                     image_x = k + offset_x;
                     
-                    // Check if indices are within bounds
                     if (image_y < IMAGE_HEIGHT && image_x < IMAGE_WIDTH) begin
                         output_matrix[i][j * HORIZONTAL_POSITIONS + k] = image[image_y][image_x];
                     end else begin
