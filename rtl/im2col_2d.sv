@@ -14,7 +14,8 @@ module im2col_2d
 (
     input logic [0 : IMAGE_HEIGHT - 1][0 : IMAGE_WIDTH - 1][DATA_WIDTH - 1 : 0] image,
     input logic [0 : KERNEL_SIZE - 1][0 : KERNEL_SIZE - 1][DATA_WIDTH - 1 : 0] kernel,
-    output logic [0 : OUTPUT_HEIGTH - 1][0 : OUTPUT_WIDTH - 1][DATA_WIDTH - 1:0] output_matrix
+    output logic [0 : OUTPUT_HEIGTH - 1][0 : OUTPUT_WIDTH - 1][DATA_WIDTH - 1:0] image_im2col,
+    output logic [0 : KERNEL_SIZE * KERNEL_SIZE - 1][DATA_WIDTH - 1:0] kernel_im2col
 );
 
     always_comb begin
@@ -23,6 +24,7 @@ module im2col_2d
         int image_y;
         int image_x;
         
+        // Process image
         for (int i = 0; i < OUTPUT_HEIGTH; i++) begin
             offset_x = i % KERNEL_SIZE;
             offset_y = (i / KERNEL_SIZE) % KERNEL_SIZE;
@@ -33,11 +35,18 @@ module im2col_2d
                     image_x = k + offset_x;
                     
                     if (image_y < IMAGE_HEIGHT && image_x < IMAGE_WIDTH) begin
-                        output_matrix[i][j * HORIZONTAL_POSITIONS + k] = image[image_y][image_x];
+                        image_im2col[i][j * HORIZONTAL_POSITIONS + k] = image[image_y][image_x];
                     end else begin
-                        output_matrix[i][j * HORIZONTAL_POSITIONS + k] = '0;
+                        image_im2col[i][j * HORIZONTAL_POSITIONS + k] = '0;
                     end
                 end
+            end
+        end
+        
+        // Process kernel - flatten into a row vector
+        for (int y = 0; y < KERNEL_SIZE; y++) begin
+            for (int x = 0; x < KERNEL_SIZE; x++) begin
+                kernel_im2col[y * KERNEL_SIZE + x] = kernel[y][x];
             end
         end
     end

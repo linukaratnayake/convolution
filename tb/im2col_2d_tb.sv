@@ -16,7 +16,8 @@ module im2col_2d_tb;
     // Define signals
     logic [0 : IMAGE_HEIGHT - 1][0 : IMAGE_WIDTH - 1][DATA_WIDTH - 1 : 0] image;
     logic [0 : KERNEL_SIZE - 1][0 : KERNEL_SIZE - 1][DATA_WIDTH - 1 : 0] kernel;
-    logic [0 : OUTPUT_HEIGTH - 1][0 : OUTPUT_WIDTH - 1][DATA_WIDTH - 1:0] output_matrix;
+    logic [0 : OUTPUT_HEIGTH - 1][0 : OUTPUT_WIDTH - 1][DATA_WIDTH - 1:0] image_im2col;
+    logic [0 : KERNEL_SIZE * KERNEL_SIZE - 1][DATA_WIDTH - 1:0] kernel_im2col;
     
     // Instantiate the im2col_2d module
     im2col_2d #(
@@ -29,7 +30,8 @@ module im2col_2d_tb;
     ) dut (
         .image(image),
         .kernel(kernel),
-        .output_matrix(output_matrix)
+        .image_im2col(image_im2col),
+        .kernel_im2col(kernel_im2col)
     );
     
     initial begin
@@ -71,14 +73,21 @@ module im2col_2d_tb;
         
         #10; // Allow some time for combinational logic to settle
         
-        // Display output matrix
-        $display("\nOutput Matrix (%0d rows x %0d columns):", OUTPUT_HEIGTH, OUTPUT_WIDTH);
+        // Display image_im2col matrix
+        $display("\nImage im2col Matrix (%0d rows x %0d columns):", OUTPUT_HEIGTH, OUTPUT_WIDTH);
         for (int i = 0; i < OUTPUT_HEIGTH; i++) begin
             for (int j = 0; j < OUTPUT_WIDTH; j++) begin
-                $write("%d\t", output_matrix[i][j]);
+                $write("%d\t", image_im2col[i][j]);
             end
             $display("");
         end
+        
+        // Display kernel_im2col vector
+        $display("\nKernel im2col (flattened 1x%0d vector):", KERNEL_SIZE * KERNEL_SIZE);
+        for (int i = 0; i < KERNEL_SIZE * KERNEL_SIZE; i++) begin
+            $write("%d\t", kernel_im2col[i]);
+        end
+        $display("");
         
         #10 $finish;
     end
